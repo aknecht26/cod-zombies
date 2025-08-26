@@ -10,12 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutral & Crimson, Indigo, Emerald -->
-    <!-- Application Structure Plan: The application is structured into five thematic, non-linear sections to facilitate user-driven exploration. It begins with a high-level visual overview (Saga Chart), followed by the core interactive Timeline for chronological discovery across three distinct sagas. The Key Characters and Lore Glossary sections serve as on-demand reference hubs. This design was chosen over a linear report format to empower users to learn at their own pace, either by following the story chronologically or by looking up specific characters and terms as their curiosity dictates, making the dense lore more accessible and less intimidating. -->
+    <!-- Application Structure Plan: The application structure remains consistent, utilizing a high-level overview (Saga Chart), a detailed map explorer, a character section, and a lore glossary. The character section has been significantly expanded to accommodate more key figures from all sagas. This structured approach efficiently manages a large volume of information by allowing users to drill down into specific details (maps or characters) from broader overviews, ensuring a user-friendly and explorable experience. -->
     <!-- Visualization & Content Choices:
-        - Report Info: Saga division (Aether vs. Dark Aether vs. Chaos) -> Goal: High-level comparison -> Viz: Horizontal Bar Chart -> Interaction: Hover tooltips -> Justification: Provides an immediate, simple visual summary of the story's structure across all major arcs. (Chart.js)
-        - Report Info: Chronological events (Table C & new Chaos events) -> Goal: Show change over time -> Presentation: Interactive Timeline with three distinct saga columns -> Interaction: Click to reveal event details -> Justification: Breaks down the dense timeline into manageable, user-triggered chunks per saga, preventing information overload and clarifying separate narratives. (HTML/CSS/JS)
-        - Report Info: Character versions (Table A & new Chaos characters) -> Goal: Compare character arcs -> Presentation: Character Cards -> Interaction: Click to open a detailed modal with tabs -> Justification: A modal provides a focused, in-context view for comparing a character's different personas or understanding their role in the Chaos story without leaving the page. (HTML/CSS/JS)
-        - Report Info: Lore definitions (Table B & new Chaos terms) -> Goal: Inform/Organize -> Presentation: Accordion List -> Interaction: Click to expand/collapse definitions -> Justification: A compact, scannable format that allows users to quickly find and read specific definitions, including new Chaos-specific terminology. (HTML/CSS/JS)
+        - Report Info: Map-by-map summaries -> Goal: Organize and Inform -> Presentation: Interactive Map Explorer -> Interaction: Click-based filtering (Game -> Map) and dynamic content display -> Justification: An interactive list is the most effective way to manage and present dozens of individual text summaries. It empowers users to find specific information quickly and efficiently, far superior to a single, long-scrolling document. (HTML/CSS/JS)
+        - Report Info: Saga division -> Goal: High-level comparison -> Viz: Horizontal Bar Chart -> Interaction: Hover tooltips -> Justification: Retained from the previous version as it still provides a useful, at-a-glance summary of the entire franchise's structure. (Chart.js)
+        - Report Info: Character details -> Goal: Compare -> Presentation: Character Cards with Modals -> Interaction: Click to open modal -> Justification: The character section has been enhanced with more comprehensive data, continuing to use a modal for detailed character versions and backstories to prevent page clutter and offer focused content. (HTML/CSS/JS)
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -27,8 +26,9 @@
         .nav-link {
             transition: color 0.3s, border-bottom-color 0.3s;
         }
-        .nav-link:hover {
+        .nav-link:hover, .game-filter-btn.active {
             color: #DC2626; /* Crimson: Red 600 */
+            border-color: #DC2626;
         }
         .timeline-item::before {
             content: '';
@@ -69,6 +69,7 @@
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="text-xl md:text-2xl font-bold text-stone-900">COD Zombies: The Saga</h1>
             <div class="hidden md:flex space-x-8">
+                <a href="#map-explorer" class="nav-link text-stone-700 font-semibold border-b-2 border-transparent">Map Explorer</a>
                 <a href="#timeline" class="nav-link text-stone-700 font-semibold border-b-2 border-transparent">Timeline</a>
                 <a href="#characters" class="nav-link text-stone-700 font-semibold border-b-2 border-transparent">Characters</a>
                 <a href="#glossary" class="nav-link text-stone-700 font-semibold border-b-2 border-transparent">Glossary</a>
@@ -78,6 +79,7 @@
             </button>
         </nav>
         <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4">
+            <a href="#map-explorer" class="block py-2 text-stone-700 font-semibold">Map Explorer</a>
             <a href="#timeline" class="block py-2 text-stone-700 font-semibold">Timeline</a>
             <a href="#characters" class="block py-2 text-stone-700 font-semibold">Characters</a>
             <a href="#glossary" class="block py-2 text-stone-700 font-semibold">Glossary</a>
@@ -96,11 +98,33 @@
         </section>
 
         <hr class="border-stone-300 my-16">
+        
+        <section id="map-explorer" class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-stone-900 mb-4">Map Explorer</h2>
+            <p class="max-w-3xl mx-auto text-lg text-center text-stone-600 mb-12">
+                Dive deep into the story of each individual map. Select a game below to see its maps, then click a map to read its narrative summary and key plot points. This is the most detailed way to explore the entire Zombies saga.
+            </p>
+            <div id="game-filter-container" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+            </div>
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="w-full md:w-1/3">
+                    <div id="map-list-container" class="bg-white rounded-lg shadow-md p-4 max-h-96 overflow-y-auto">
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3">
+                    <div id="map-details-container" class="bg-white rounded-lg shadow-md p-6 min-h-[24rem]">
+                        <p class="text-stone-500 text-center pt-24">Select a game and then a map to see details.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-stone-300 my-16">
 
         <section id="timeline" class="mb-16">
-            <h2 class="text-3xl font-bold text-center text-stone-900 mb-4">Story Timeline</h2>
+            <h2 class="text-3xl font-bold text-center text-stone-900 mb-4">Story Timeline Overview</h2>
             <p class="max-w-3xl mx-auto text-lg text-center text-stone-600 mb-12">
-                Explore the complete chronological history of the Zombies saga. The story is divided into three major arcs. Click on any game or era below to uncover the key events, character introductions, and plot twists that define the narrative.
+                Explore the high-level history of the Zombies saga. The story is divided into three major arcs. Click on any game or era below to see a summary of its overarching narrative.
             </p>
             <div class="flex flex-col md:flex-row gap-8">
                 <div class="flex-1">
@@ -174,212 +198,40 @@
     <script>
         const AppData = {
             timeline: [
-                {
-                    saga: 'Aether',
-                    era: 'World at War (1931-1945)',
-                    games: 'World at War',
-                    title: 'Genesis & Group 935',
-                    content: `The story begins with the discovery of Element 115, leading to the formation of Group 935. Dr. Richtofen's ambition, corruption by the MPD, and betrayal of Dr. Maxis directly cause the initial zombie outbreak. He creates the mentally shattered 'Ultimis' crew (Dempsey, Nikolai, Takeo) as test subjects. When Samantha Maxis enters the MPD, she gains control of the zombies and seeks revenge, forcing Richtofen and his crew to flee.`
-                },
-                {
-                    saga: 'Aether',
-                    era: 'Black Ops (1963-1968)',
-                    games: 'Black Ops',
-                    title: 'The Grand Scheme',
-                    content: `The Ultimis crew travels through time and space, from a Soviet Cosmodrome to Shangri-La, following Richtofen's cryptic plan. Their journey culminates on the Moon, where Richtofen swaps bodies with Samantha to gain full control of the Aether and the zombie horde. However, Maxis launches missiles at the Earth, destroying it to sever Richtofen's connection.`
-                },
-                {
-                    saga: 'Aether',
-                    era: 'Black Ops II (1918 / 2025)',
-                    games: 'Black Ops II',
-                    title: 'A Fractured Reality',
-                    content: `The story splits. In 2025, the 'Victis' crew navigates the ruined Earth, manipulated by the competing consciousnesses of Maxis and Richtofen. In a separate 1918 timeline, 'Origins' introduces the younger, more heroic 'Primis' crew. They are contacted by Samantha to free her from Agartha, setting in motion their destiny to fight the impending apocalypse and revealing the existence of a repeating 'Cycle'.`
-                },
-                {
-                    saga: 'Aether',
-                    era: 'Black Ops III (2035)',
-                    games: 'Black Ops III',
-                    title: 'Hunting the Paradox',
-                    content: `The Primis crew travels across the multiverse with a singular goal: to find and kill their corrupted Ultimis counterparts to collect their souls and prevent the timeline from collapsing. Their journey leads them to Dr. Monty's 'perfect world,' The House, but they inadvertently release the ancient Apothicon evil, the Shadowman.`
-                },
-                {
-                    saga: 'Aether',
-                    era: 'Black Ops 4 (2035-2045)',
-                    games: 'Black Ops 4',
-                    title: 'Breaking the Cycle',
-                    content: `The saga concludes in a desperate, final act. After realizing the Cycle cannot be fixed and that they themselves are a paradox, Nikolai reads the Kronorium and devises a plan. He poisons the crew and has Samantha kill him, using the combined power of their souls to destroy the entire multiverse and banish all traces of Element 115 to the Dark Aether. Only a young, pure Samantha and a child named Eddie (Richtofen) are sent to a new, singular universe.`
-                },
-                {
-                    saga: 'Dark Aether',
-                    era: 'Cold War (1983-1985)',
-                    games: 'Black Ops Cold War',
-                    title: 'A New Outbreak: Projekt Endstation',
-                    content: `In the new universe, a Nazi experiment, Projekt Endstation, breaches the Dark Aether, causing its corruption to 'leak' back into reality and initiate a new zombie outbreak. The CIA-backed Requiem and Soviet-led Omega Group race to contain the threat and exploit the phenomenon. Samantha Maxis, an operative for Requiem, confronts this initial wave of incursions.`
-                },
-                {
-                    saga: 'Dark Aether',
-                    era: 'Vanguard (1940s-1950s)',
-                    games: 'Vanguard',
-                    title: 'The Dark Aether Origins',
-                    content: `Further exploring the origins of the Dark Aether's influence in the new universe, Vanguard's narrative takes place earlier, during and after WWII. It details the initial breaches of the Dark Aether by Nazi occultists and their attempts to harness its power, leading to early manifestations of zombie threats and the rise of entities like Kortifex the Deathless. The conflict between Requiem and Omega Group also has its roots in these post-WWII paranormal investigations.`
-                },
-                {
-                    saga: 'Dark Aether',
-                    era: 'Modern Warfare Zombies (2023)',
-                    games: 'Modern Warfare III',
-                    title: 'The Threat Evolves',
-                    content: `Years later, a new outbreak occurs in Urzikstan, orchestrated by arms dealer Viktor Zakhaev. He harnesses the power of Aetherium, creating a new type of zombie. A new protagonist, Ava Jansen, is introduced, but becomes possessed by a Dark Aether entity, showing the corruption is becoming more insidious.`
-                },
-                {
-                    saga: 'Dark Aether',
-                    era: 'Black Ops 6 (1991)',
-                    games: 'Black Ops 6',
-                    title: 'A Personal Vendetta',
-                    content: `Set six years after Cold War, the story reveals the new antagonist is 'Eddie'—the child version of Richtofen from the end of the Aether saga, now grown. His family was killed by Weaver and Samantha, setting him on a path of revenge. He imprison the Requiem crew and initiates 'Project Janus' to get his family back, creating monstrous entities in the process. The Requiem crew must escape and stop him while dealing with a Samantha who is becoming corrupted by the Dark Aether.`
-                },
-                {
-                    saga: 'Chaos',
-                    era: 'Black Ops 4 (1912)',
-                    games: 'Black Ops 4',
-                    title: 'Voyage of Despair',
-                    content: `Scarlett Rhodes, Diego Necalli, Bruno Delacroix, and Stanton Shaw investigate the disappearance of her father, Alistair Rhodes, on the RMS Titanic. They confront the power of ancient artifacts and the Order of Chaos.`
-                },
-                {
-                    saga: 'Chaos',
-                    era: 'Black Ops 4 (1912)',
-                    games: 'Black Ops 4',
-                    title: 'IX',
-                    content: `The Chaos crew is transported to an ancient Roman arena, forced to fight gladiatorial combat against zombies and mythical beasts, seeking answers about Alistair and the Relics.`
-                },
-                {
-                    saga: 'Chaos',
-                    era: 'Black Ops 4 (1912)',
-                    games: 'Black Ops 4',
-                    title: 'Dead of the Night',
-                    content: `The crew travels to Alistair Rhodes' manor, where they encounter a mysterious cult, werewolves, and vampires, all tied to the ancient Relics and the Eye of Apollyon.`
-                },
-                {
-                    saga: 'Chaos',
-                    era: 'Black Ops 4 (1912)',
-                    games: 'Black Ops 4',
-                    title: 'Ancient Evil',
-                    content: `The Chaos crew ventures to the Oracle of Delphi in ancient Greece, confronting a powerful artifact, more mythical creatures, and the true intentions of the Order of Chaos.`
-                }
+                { saga: 'Aether', era: 'World at War (1931-1945)', games: 'World at War', title: 'Genesis & Group 935', content: `The story begins with the discovery of Element 115, leading to the formation of Group 935. Dr. Richtofen's ambition, corruption by the MPD, and betrayal of Dr. Maxis directly cause the initial zombie outbreak. He creates the mentally shattered 'Ultimis' crew (Dempsey, Nikolai, Takeo) as test subjects. When Samantha Maxis enters the MPD, she gains control of the zombies and seeks revenge, forcing Richtofen and his crew to flee.` },
+                { saga: 'Aether', era: 'Black Ops (1963-1968)', games: 'Black Ops', title: 'The Grand Scheme', content: `The Ultimis crew travels through time and space, from a Soviet Cosmodrome to Shangri-La, following Richtofen's cryptic plan. Their journey culminates on the Moon, where Richtofen swaps bodies with Samantha to gain full control of the Aether and the zombie horde. However, Maxis launches missiles at the Earth, destroying it to sever Richtofen's connection.` },
+                { saga: 'Aether', era: 'Black Ops II (1918 / 2025)', games: 'Black Ops II', title: 'A Fractured Reality', content: `The story splits. In 2025, the 'Victis' crew navigates the ruined Earth, manipulated by the competing consciousnesses of Maxis and Richtofen. In a separate 1918 timeline, 'Origins' introduces the younger, more heroic 'Primis' crew. They are contacted by Samantha to free her from Agartha, setting in motion their destiny to fight the impending apocalypse and revealing the existence of a repeating 'Cycle'.` },
+                { saga: 'Aether', era: 'Black Ops III (2035)', games: 'Black Ops III', title: 'Hunting the Paradox', content: `The Primis crew travels across the multiverse with a singular goal: to find and kill their corrupted Ultimis counterparts to collect their souls and prevent the timeline from collapsing. Their journey leads them to Dr. Monty's 'perfect world,' The House, but they inadvertently release the ancient Apothicon evil, the Shadowman.` },
+                { saga: 'Aether', era: 'Black Ops 4 (2035-2045)', games: 'Black Ops 4', title: 'Breaking the Cycle', content: `The saga concludes in a desperate, final act. After realizing the Cycle cannot be fixed and that they themselves are a paradox, Nikolai reads the Kronorium and devises a plan. He poisons the crew and has Samantha kill him, using the combined power of their souls to destroy the entire multiverse and banish all traces of Element 115 to the Dark Aether. Only a young, pure Samantha and a child named Eddie (Richtofen) are sent to a new, singular universe.` },
+                { saga: 'Dark Aether', era: 'Vanguard (1940s)', games: 'Vanguard', title: 'The Dark Aether Origins', content: `Vanguard's narrative takes place during and after WWII, detailing the initial breaches of the Dark Aether by Nazi occultists and their attempts to harness its power. This leads to early zombie threats and the rise of entities like Kortifex the Deathless.` },
+                { saga: 'Dark Aether', era: 'Cold War (1983-1985)', games: 'Black Ops Cold War', title: 'A New Outbreak', content: `In the new universe, a Nazi experiment, Projekt Endstation, breaches the Dark Aether, causing its corruption to 'leak' back into reality. The CIA-backed Requiem and Soviet-led Omega Group race to contain the threat. Samantha Maxis, now a Requiem operative, confronts this new wave of incursions.` },
+                { saga: 'Dark Aether', era: 'Black Ops 6 (1991)', games: 'Black Ops 6', title: 'A Personal Vendetta', content: `Set six years after Cold War, the story reveals the new antagonist is 'Eddie'—the child version of Richtofen from the end of the Aether saga, now grown. His family was killed by Weaver and Samantha, setting him on a path of revenge. He imprisons the Requiem crew and initiates 'Project Janus' to get his family back.` },
+                { saga: 'Dark Aether', era: 'Modern Warfare Zombies (2023)', games: 'Modern Warfare III', title: 'The Threat Evolves', content: `Years later, a new outbreak occurs in Urzikstan, orchestrated by arms dealer Viktor Zakhaev. He harnesses the power of Aetherium, creating a new type of zombie. A new protagonist, Ava Jansen, is introduced, but becomes possessed by a Dark Aether entity.` },
+                { saga: 'Chaos', era: 'Black Ops 4 (1912)', games: 'Black Ops 4', title: 'The Chaos Story', content: `A separate narrative arc set in 1912, following Scarlett Rhodes and her crew as they investigate her father's disappearance. Their journey involves ancient artifacts, mythical creatures, and a secret society known as the Order of Chaos.` }
             ],
             characters: [
-                {
-                    name: "Richtofen",
-                    img: "https://placehold.co/400x400/DC2626/FFFFFF?text=R",
-                    versions: {
-                        Ultimis: "A power-hungry, insane scientist from Group 935. Corrupted by Element 115 and the MPD, his primary goal is to gain ultimate control over the Aether and the zombie horde, no matter the cost.",
-                        Primis: "A younger, more heroic and calculated version from an alternate dimension. He understands the cosmic threat of the Cycle and masterminds the plan to travel the multiverse and collect souls to break it.",
-                        'Eddie (Dark Aether)': "The child survivor of the multiverse's destruction. After his new family is killed by Weaver and Samantha, he becomes a tragic villain, driven by grief and revenge to launch 'Project Janus' and bring them back."
-                    }
-                },
-                {
-                    name: "Dempsey",
-                    img: "https://placehold.co/400x400/2563EB/FFFFFF?text=D",
-                    versions: {
-                        Ultimis: "A stereotypical, loud-mouthed American Marine whose mind was shattered by Richtofen's experiments. He remembers little of his past and is often the comedic relief, fueled by a desire for violence and revenge against Richtofen.",
-                        Primis: "A younger, more thoughtful and emotionally grounded soldier. He is a loyal and crucial member of the Primis crew, acting as the moral compass and often questioning Richtofen's increasingly drastic measures.",
-                        'Dark Aether': "N/A",
-                        'Chaos': "N/A"
-                    }
-                },
-                {
-                    name: "Nikolai",
-                    img: "https://placehold.co/400x400/4B5563/FFFFFF?text=N",
-                    versions: {
-                        Ultimis: "A vodka-obsessed, crude Russian soldier and another of Richtofen's test subjects. He mourns his lost wife and uses alcohol to cope with the horrors he faces.",
-                        Primis: "A more stoic and weary leader. He has seen the horrors of the Cycle countless times. After reading the Kronorium, he accepts the burden of leadership and makes the ultimate sacrifice to destroy the multiverse for good.",
-                        'Dark Aether': "N/A",
-                        'Chaos': "N/A"
-                    }
-                },
-                {
-                    name: "Takeo",
-                    img: "https://placehold.co/400x400/16A34A/FFFFFF?text=T",
-                    versions: {
-                        Ultimis: "A Japanese officer who speaks in proverbs and obsesses over honor. His mind was also broken by Richtofen, leaving him confused and blindly loyal to the Emperor.",
-                        Primis: "A younger, more honorable and wise warrior. He is the spiritual center of the Primis crew, providing guidance and unwavering loyalty to their cause of breaking the Cycle.",
-                        'Dark Aether': "N/A",
-                        'Chaos': "N/A"
-                    }
-                },
-                {
-                    name: "Samantha",
-                    img: "https://placehold.co/400x400/FBBF24/FFFFFF?text=S",
-                    versions: {
-                        'Aether Saga': "The catalyst for the entire story. As a child, she is trapped in the MPD and gains control of the zombies, seeking revenge on Richtofen. She later becomes a key ally to the Primis crew in their quest to break the Cycle.",
-                        'Dark Aether': "A new version in the new universe with no memory of her past, but she retains her powers. She works for Requiem to fight the Dark Aether threat, but is becoming increasingly corrupted by its influence.",
-                        'Chaos': "N/A"
-                    }
-                },
-                {
-                    name: "Maxis",
-                    img: "https://placehold.co/400x400/6D28D9/FFFFFF?text=M",
-                    versions: {
-                        'Aether Saga': "Richtofen's original partner in Group 935. After being betrayed, his consciousness enters the Aether, where he becomes a powerful, god-like entity. He becomes corrupted by this power and acts as a major antagonist to both the Ultimis and Victis crews.",
-                        'Dark Aether': "N/A",
-                        'Chaos': "N/A"
-                    }
-                },
-                {
-                    name: "Grigori Weaver",
-                    img: "https://placehold.co/400x400/4B5563/FFFFFF?text=GW",
-                    versions: {
-                        'Dark Aether': "A high-ranking CIA agent and the leader of Requiem. He is instrumental in fighting the Dark Aether threat and is a target of Eddie's revenge."
-                    }
-                },
-                {
-                    name: "Dr. Carver",
-                    img: "https://placehold.co/400x400/6B7280/FFFFFF?text=DC",
-                    versions: {
-                        'Dark Aether': "A scientist working with Requiem, providing expertise on the Dark Aether and its effects. He is a key member of the team trying to understand and contain the outbreaks."
-                    }
-                },
-                {
-                    name: "Dr. Grey",
-                    img: "https://placehold.co/400x400/9CA3AF/FFFFFF?text=DG",
-                    versions: {
-                        'Dark Aether': "Another scientist within Requiem, often working closely with Dr. Carver to analyze the anomalous phenomena associated with the Dark Aether. She provides critical scientific insights to the team."
-                    }
-                },
-                {
-                    name: "Maya",
-                    img: "https://placehold.co/400x400/8B5CF6/FFFFFF?text=MA",
-                    versions: {
-                        'Dark Aether': "A skilled operative within Requiem who aids the team in their fight against the Dark Aether incursions. She is known for her combat expertise and dedication to the mission."
-                    }
-                },
-                {
-                    name: "Scarlett Rhodes",
-                    img: "https://placehold.co/400x400/EF4444/FFFFFF?text=SR",
-                    versions: {
-                        Chaos: "A resourceful adventurer and occult historian, Scarlett is searching for her missing father, Alistair Rhodes, and is the leader of the Chaos crew. She possesses a keen intellect and is skilled with various weapons."
-                    }
-                },
-                {
-                    name: "Diego Necalli",
-                    img: "https://placehold.co/400x400/F97316/FFFFFF?text=DN",
-                    versions: {
-                        Chaos: "A suave con artist and former gambler, Diego is a loyal member of Scarlett's crew. He uses his charm and quick thinking to navigate dangerous situations, though he often finds himself in over his head."
-                    }
-                },
-                {
-                    name: "Bruno Delacroix",
-                    img: "https://placehold.co/400x400/4F46E5/FFFFFF?text=BD",
-                    versions: {
-                        Chaos: "A former assassin, Bruno is a strong and silent force within the Chaos crew. He is seeking redemption for his past actions and is fiercely protective of his allies, using his brute strength and combat skills to overcome threats."
-                    }
-                },
-                {
-                    name: "Stanton Shaw",
-                    img: "https://placehold.co/400x400/10B981/FFFFFF?text=SS",
-                    versions: {
-                        Chaos: "An eccentric and brilliant academic, Shaw is a former professor and expert in ancient languages and the occult. He provides vital knowledge to the Chaos crew, though his absent-mindedness often leads to comical situations."
-                    }
-                }
+                { name: "Richtofen", img: "https://placehold.co/400x400/DC2626/FFFFFF?text=R", versions: { Ultimis: "A power-hungry, insane scientist from Group 935. Corrupted by Element 115 and the MPD, his primary goal is to gain ultimate control over the Aether and the zombie horde, no matter the cost.", Primis: "A younger, more heroic and calculated version from an alternate dimension. He understands the cosmic threat of the Cycle and masterminds the plan to travel the multiverse and collect souls to break it.", 'Eddie (Dark Aether)': "The child survivor of the multiverse's destruction. After his new family is killed by Weaver and Samantha, he becomes a tragic villain, driven by grief and revenge to launch 'Project Janus' and bring them back." } },
+                { name: "Dempsey", img: "https://placehold.co/400x400/2563EB/FFFFFF?text=D", versions: { Ultimis: "A stereotypical, loud-mouthed American Marine whose mind was shattered by Richtofen's experiments. He remembers little of his past and is often the comedic relief, fueled by a desire for violence and revenge against Richtofen.", Primis: "A younger, more thoughtful and emotionally grounded soldier. He is a loyal and crucial member of the Primis crew, acting as the moral compass and often questioning Richtofen's increasingly drastic measures." } },
+                { name: "Nikolai", img: "https://placehold.co/400x400/4B5563/FFFFFF?text=N", versions: { Ultimis: "A vodka-obsessed, crude Russian soldier and another of Richtofen's test subjects. He mourns his lost wife and uses alcohol to cope with the horrors he faces.", Primis: "A more stoic and weary leader. He has seen the horrors of the Cycle countless times. After reading the Kronorium, he accepts the burden of leadership and makes the ultimate sacrifice to destroy the multiverse for good." } },
+                { name: "Takeo", img: "https://placehold.co/400x400/16A34A/FFFFFF?text=T", versions: { Ultimis: "A Japanese officer who speaks in proverbs and obsesses over honor. His mind was also broken by Richtofen, leaving him confused and blindly loyal to the Emperor.", Primis: "A younger, more honorable and wise warrior. He is the spiritual center of the Primis crew, providing guidance and unwavering loyalty to their cause of breaking the Cycle." } },
+                { name: "Samantha", img: "https://placehold.co/400x400/FBBF24/FFFFFF?text=S", versions: { 'Aether Saga': "The catalyst for the entire story. As a child, she is trapped in the MPD and gains control of the zombies, seeking revenge on Richtofen. She later becomes a key ally to the Primis crew in their quest to break the Cycle.", 'Dark Aether': "A new version in the new universe with no memory of her past, but she retains her powers. She works for Requiem to fight the Dark Aether threat, but is becoming increasingly corrupted by its influence." } },
+                { name: "Maxis", img: "https://placehold.co/400x400/6D28D9/FFFFFF?text=M", versions: { 'Aether Saga': "Richtofen's original partner in Group 935. After being betrayed, his consciousness enters the Aether, where he becomes a powerful, god-like entity. He becomes corrupted by this power and acts as a major antagonist to both the Ultimis and Victis crews." } },
+                { name: "Samuel Stuhlinger", img: "https://placehold.co/400x400/059669/FFFFFF?text=SS", versions: { Victis: "A former member of a cult that worshipped the zombies, he can hear Richtofen's thoughts due to consuming zombie flesh. He's a key member of the Victis crew." } },
+                { name: "Marlton Johnson", img: "https://placehold.co/400x400/CA8A04/FFFFFF?text=MJ", versions: { Victis: "A socially awkward but brilliant engineer who survived the Nuketown explosion. He provides technical expertise to the Victis crew." } },
+                { name: "Abigail 'Misty' Briarton", img: "https://placehold.co/400x400/E11D48/FFFFFF?text=AB", versions: { Victis: "A tough, resilient survivor who joins the Victis crew. She often acts as the group's protector and has a strong personality." } },
+                { name: "Russman", img: "https://placehold.co/400x400/6D28D9/FFFFFF?text=R", versions: { Victis: "An amnesiac, war-weary soldier who guides the Victis crew. His past is shrouded in mystery, and he possesses a unique connection to Element 115." } },
+                { name: "Dr. Monty", img: "https://placehold.co/400x400/7C3AED/FFFFFF?text=DM", versions: { Aether: "A powerful, seemingly benevolent, god-like entity who created and oversees 'the House' and attempts to maintain the balance of the multiverse, often manipulating events from behind the scenes." } },
+                { name: "Shadowman", img: "https://placehold.co/400x400/0F172A/FFFFFF?text=SM", versions: { Aether: "A primordial evil entity and a leader of the Apothicons. He manipulates events to unleash his brethren upon the multiverse, serving as a major antagonist." } },
+                { name: "Grigori Weaver", img: "https://placehold.co/400x400/4B5563/FFFFFF?text=GW", versions: { 'Dark Aether': "A high-ranking CIA agent and the leader of Requiem. He is instrumental in fighting the Dark Aether threat and is a target of Eddie's revenge." } },
+                { name: "Dr. Carver", img: "https://placehold.co/400x400/6B7280/FFFFFF?text=DC", versions: { 'Dark Aether': "A scientist working with Requiem, providing expertise on the Dark Aether and its effects. He is a key member of the team trying to understand and contain the outbreaks." } },
+                { name: "Dr. Grey", img: "https://placehold.co/400x400/9CA3AF/FFFFFF?text=DG", versions: { 'Dark Aether': "Another scientist within Requiem, often working closely with Dr. Carver to analyze the anomalous phenomena associated with the Dark Aether. She provides critical scientific insights to the team." } },
+                { name: "Maya", img: "https://placehold.co/400x400/8B5CF6/FFFFFF?text=MA", versions: { 'Dark Aether': "A skilled operative within Requiem who aids the team in their fight against the Dark Aether incursions. She is known for her combat expertise and dedication to the mission." } },
+                { name: "Dr. Peck", img: "https://placehold.co/400x400/DC2626/FFFFFF?text=DP", versions: { 'Dark Aether': "A brilliant but arrogant Omega Group scientist who is obsessed with understanding and controlling the Dark Aether. He frequently clashes with Requiem and is a key antagonist." } },
+                { name: "Colonel Kravchenko", img: "https://placehold.co/400x400/4B5563/FFFFFF?text=CK", versions: { 'Dark Aether': "A ruthless Soviet military officer and a high-ranking member of the Omega Group, leading their efforts to weaponize the Dark Aether." } },
+                { name: "Scarlett Rhodes", img: "https://placehold.co/400x400/EF4444/FFFFFF?text=SR", versions: { Chaos: "A resourceful adventurer and occult historian, Scarlett is searching for her missing father, Alistair Rhodes, and is the leader of the Chaos crew. She possesses a keen intellect and is skilled with various weapons." } },
+                { name: "Diego Necalli", img: "https://placehold.co/400x400/F97316/FFFFFF?text=DN", versions: { Chaos: "A suave con artist and former gambler, Diego is a loyal member of Scarlett's crew. He uses his charm and quick thinking to navigate dangerous situations, though he often finds himself in over his head." } },
+                { name: "Bruno Delacroix", img: "https://placehold.co/400x400/4F46E5/FFFFFF?text=BD", versions: { Chaos: "A former assassin, Bruno is a strong and silent force within the Chaos crew. He is seeking redemption for his past actions and is fiercely protective of his allies, using his brute strength and combat skills to overcome threats." } },
+                { name: "Stanton Shaw", img: "https://placehold.co/400x400/10B981/FFFFFF?text=SS", versions: { Chaos: "An eccentric and brilliant academic, Shaw is a former professor and expert in ancient languages and the occult. He provides vital knowledge to the Chaos crew, though his absent-mindedness often leads to comical situations." } }
             ],
             glossary: [
                 { term: "Element 115", definition: "An extraterrestrial element with the power to reanimate dead tissue and manipulate space-time. It is the origin of the zombies, the Wonder Weapons, and the corruption that drives much of the Aether Saga." },
@@ -390,11 +242,68 @@
                 { term: "Primis", definition: "The younger, more coherent versions of the original crew from an alternate timeline, introduced in the 'Origins' map." },
                 { term: "The Cycle", definition: "A deterministic, repeating time loop that traps the characters and events of the Aether saga. Every attempt to fix the timeline ultimately leads to the same apocalyptic outcome, forcing the Primis crew to seek a way to break it entirely." },
                 { term: "The Kronorium", definition: "A powerful book that contains all the knowledge of the multiverse’s history and future. Reading it allows one to see all possible pasts, presents, and futures, and is key to Nikolai’s final plan." },
-                { term: "Chaos Story", definition: "A completely separate and unfinished narrative arc introduced in Black Ops 4, featuring a new crew and lore centered around ancient artifacts, gods, and the conflict between the Order and Chaos." },
-                { term: "Order of Chaos", definition: "An ancient secret society that seeks to control powerful mystical artifacts, known as Relics, and harness the power of primordial forces." },
-                { term: "Relics", definition: "Powerful ancient artifacts with immense magical properties, central to the Chaos Story. They are often sought after by the Order of Chaos and are the source of many supernatural events." },
-                { term: "Eye of Apollyon", definition: "A significant and dangerous Relic in the Chaos Story, possessing immense power that can unleash devastating forces or grant incredible abilities." }
-            ]
+                { term: "Chaos Story", definition: "A completely separate and unfinished narrative arc introduced in Black Ops 4, featuring a new crew and lore centered around ancient artifacts, gods, and the conflict between the Order and Chaos." }
+            ],
+            maps: {
+                'World at War': [
+                    { name: 'Nacht der Untoten', summary: 'Set in an abandoned German bunker, this is the ground zero of the outbreak. An Allied plane carrying a Group 935 transport crashes, unleashing undead soldiers. Four unnamed U.S. Marines are the sole survivors, forced to fight for their lives with an unknown fate.' },
+                    { name: 'Verrückt', summary: 'Taking place in a German asylum, this map introduces Tank Dempsey. He\'s part of a Marine unit sent to extract an American spy, Peter McCain. The mission fails, and Dempsey is captured, becoming a test subject for Dr. Richtofen.' },
+                    { name: 'Shi No Numa', summary: 'Located in a Japanese swamp, this map introduces the full "Ultimis" crew: Dempsey, Nikolai, Takeo, and Richtofen. Richtofen is here to retrieve his diary, which contains vital information on how to counter Samantha Maxis\'s control over the zombies.' },
+                    { name: 'Der Riese', summary: 'At a German factory, Richtofen betrays his partner, Dr. Maxis, trapping him and his daughter Samantha in a teleporter. Samantha is sent to the Moon, where she enters the MPD and gains full control of the zombies, seeking revenge. The Ultimis crew overloads a teleporter, accidentally sending themselves into the future.' }
+                ],
+                'Black Ops': [
+                    { name: 'Kino der Toten', summary: 'The crew lands in an abandoned German theater in the 1960s, a former Group 935 facility. They discover a lunar lander and use it to escape to their next destination, alerting Dr. Monty to their existence.' },
+                    { name: 'Five', summary: 'Occurring at the same time as Ascension, this story is set in the Pentagon. Cold War leaders JFK, Nixon, Castro, and McNamara must fight off a zombie outbreak, confirming that the U.S. government is aware of the threat through its own research group, Broken Arrow.' },
+                    { name: 'Ascension', summary: 'The crew arrives at a Russian cosmodrome. Here, they free the soul of a trapped scientist, Dr. Gersh, who in turn opens a rift that teleports them to Siberia.' },
+                    { name: 'Call of the Dead', summary: 'A side-story where the Ultimis crew is trapped. They enlist the help of a celebrity cast (George Romero, Sarah Michelle Gellar, etc.) to retrieve the Golden Rod for Richtofen, a key artifact for his plan.' },
+                    { name: 'Shangri-La', summary: 'The crew teleports to a mystical jungle temple stuck in a time loop. They help two trapped explorers retrieve the Focusing Stone, the final piece Richtofen needs to control the MPD on the Moon.' },
+                    { name: 'Moon', summary: 'At Griffin Station on the Moon, Richtofen uses the artifacts to swap bodies with Samantha and take control of the zombies. In a desperate act, Maxis convinces the remaining crew to launch missiles at the Earth, destroying it and shattering reality.' }
+                ],
+                'Black Ops II': [
+                    { name: 'Nuketown Zombies', summary: 'This map takes place during the events of Moon. A team of CIA and CDC agents are fighting zombies at a Nevada nuclear test site when one of Maxis\'s missiles hits, wiping everyone out except for Marlton Johnson, who survives in a fallout shelter.' },
+                    { name: 'Tranzit', summary: 'This large map follows the new "Victis" crew (Marlton, Misty, Russman, and Samuel) as they navigate the ruined Earth, manipulated by the competing voices of Maxis and Richtofen.' },
+                    { name: 'Die Rise', summary: 'The Victis crew continues their journey in a series of crumbling skyscrapers in China, still following the instructions of either Maxis or Richtofen to power up a polarization device.' },
+                    { name: 'Buried', summary: 'Set in an underground western town in Africa, this is the final map for the Victis crew. Their actions here, siding with either Maxis or Richtofen, determine the fate of the Earth. The canonical ending sees them siding with Maxis.' },
+                    { name: 'Origins', summary: 'This map introduces an alternate timeline in WWI France and a younger, more heroic version of the original crew, known as "Primis." They are contacted by a pure version of Samantha and successfully free her and a non-corrupted Maxis into a "perfect world" called "the House."' }
+                ],
+                'Black Ops III': [
+                    { name: 'The Giant', summary: 'A direct continuation of Origins, Primis arrives at the Der Riese facility to find their older selves. Primis Richtofen kills his Ultimis counterpart to begin the plan of collecting their souls.' },
+                    { name: 'Der Eisendrache', summary: 'Set in a castle in Austria, the Primis crew travels here to stop a Group 935 operation on the Moon. They succeed and kill Ultimis Dempsey, collecting his soul.' },
+                    { name: 'Zetsubou No Shima', summary: 'On a remote Pacific island, the crew confronts Division 9, a Japanese research group. They find and kill Ultimis Takeo, securing his soul for their mission.' },
+                    { name: 'Gorod Krovi', summary: 'In a war-torn Stalingrad infested with dragons, Primis confronts the last of their older selves. They kill Ultimis Nikolai and collect his soul, completing their primary objective.' },
+                    { name: 'Revelations', summary: 'The crew confronts Dr. Monty in "the House." However, the ancient evil known as the Shadowman is released. After defeating him, Monty reveals they are stuck in a time loop and sends them back in time, where they become ancient heroes, thus restarting the very cycle they tried to break.' }
+                ],
+                'Black Ops 4': [
+                    { name: 'Blood of the Dead', summary: 'A reimagining of Mob of the Dead, this map shows a critical failure in the cycle. Primis is trapped in Alcatraz, and Richtofen is forced to sacrifice himself to allow the others to escape, altering the timeline.' },
+                    { name: 'Classified', summary: 'A reimagining of "Five," this map follows the Ultimis crew after the events of Moon, showing how they were captured by the US government and eventually freed by the Primis crew.' },
+                    { name: 'Alpha Omega', summary: 'Primis and Ultimis meet at a broken Nuketown facility. They retrieve the Elemental Shard, a key component for their final plan to break the cycle.' },
+                    { name: 'Tag der Toten', summary: 'The final Aether map. Realizing the loop is unbreakable, Nikolai devises a final plan. He poisons the crew and has Samantha kill him, using their combined souls to destroy the multiverse and send all corruption to the Dark Aether. Only a young Samantha and Eddie (Richtofen) are sent to a new, pure universe.' },
+                    { name: 'IX', summary: 'Part of the Chaos story. The new crew (Scarlett, Diego, Bruno, Shaw) finds themselves in an ancient Roman arena, forced to fight in gladiatorial combat against zombies and mythical beasts.' },
+                    { name: 'Voyage of Despair', summary: 'The Chaos crew investigates the disappearance of Scarlett\'s father, Alistair Rhodes, aboard the RMS Titanic. They confront the power of ancient artifacts and the Order of Chaos.' },
+                    { name: 'Dead of the Night', summary: 'The Chaos crew travels to Alistair Rhodes\' manor, where they encounter a mysterious cult, werewolves, and vampires, all tied to ancient Relics.' },
+                    { name: 'Ancient Evil', summary: 'The Chaos crew ventures to the Oracle of Delphi in ancient Greece, confronting a powerful artifact and the true intentions of the Order of Chaos.' }
+                ],
+                'Vanguard': [
+                    { name: 'Der Anfang', summary: 'Set in Stalingrad after WWII, this map introduces the Dark Aether entities and the concept of demonic pacts. It establishes the origins of the new outbreak, where Nazi occultists accidentally breached the Dark Aether.' },
+                    { name: 'Terra Maledicta', summary: 'The story continues in the Egyptian desert, where the team seeks a lost page from the Tome of Rituals to sever the connection with the entity Kortifex.' },
+                    { name: 'Shi No Numa (Vanguard)', summary: 'A reimagining of the classic map, this version is tied to the Dark Aether saga. The team travels to the "Swamp of Death" to confront Kortifex and retrieve a relic.' },
+                    { name: 'The Archon', summary: 'The final Vanguard map. The team travels deep into the Dark Aether to face Kortifex the Deathless in a final showdown to stop his influence on their world.' }
+                ],
+                'Black Ops Cold War': [
+                    { name: 'Die Maschine', summary: 'In the 1980s, the CIA-backed Requiem investigates a Dark Aether breach at a Polish research site caused by Projekt Endstation. They are assisted by a new version of Samantha Maxis.' },
+                    { name: 'Firebase Z', summary: 'Requiem\'s rival, the KGB\'s Omega Group, tries to harness the Dark Aether in Vietnam. Samantha is briefly captured and thrown into the dimension but is rescued, emerging with new powers.' },
+                    { name: 'Mauer der Toten', summary: 'Set in Berlin, Requiem must stop Omega Group\'s leader, Kravchenko, from unleashing an army of the undead upon the world.' },
+                    { name: 'Forsaken', summary: 'The final Cold War map. The new villain is revealed to be Eddie (Richtofen). To stop a powerful entity called "The Forsaken," Samantha sacrifices herself by trapping it, and herself, back in the Dark Aether.' }
+                ],
+                 'Black Ops 6': [
+                    { name: 'Terminus', summary: 'Set six years after Cold War, this map is an island prison where Eddie has been holding the Requiem team. The main quest involves the team escaping and fighting "Patient 13," a monstrous creation from Eddie\'s "Project Janus."' },
+                    { name: 'Liberty Falls', summary: 'An outbreak occurs in a West Virginia town, revealed to have been caused by Samantha Maxis, who has now broken free from the Dark Aether. The main quest involves crafting the classic Jet Gun Wonder Weapon.' },
+					{ name: 'Citadelle des Morts', summary: 'Set in a mysterious medieval citadel in Avalon, the Requiem team investigates a zombie outbreak tied to ancient relics and a French Syndicate. They seek the Sentinel Artifact to potentially save Samantha Maxis.' },
+                    { name: 'The Tomb', summary: 'Following the events of Citadelle des Morts, the team ventures into ancient Romanesque catacombs to continue the hunt for the Sentinel Artifact, confronting paranormal activity and discovering the Staff of Ice Wonder Weapon.' },
+                    { name: 'Shattered Veil', summary: 'The crew finds themselves in a mansion near Liberty Falls, where spacetime has been fractured by a ritual. They must navigate pocket dimensions and confront a zombified T-Rex while trying to understand Samantha\'s true intentions with the Sentinel Artifact.' },
+                    { name: 'Reckoning', summary: 'The final Black Ops 6 Zombies map. The Requiem team infiltrates Janus Towers to confront S.A.M. and her quest for ultimate power. The map features dynamic gravity zones and a climax to the Dark Aether storyline, with multiple possible endings.' }
+                ]
+            }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -411,65 +320,40 @@
             const modalCharName = document.getElementById('modal-char-name');
             const modalTabs = document.getElementById('modal-tabs');
             const modalContent = document.getElementById('modal-content');
-
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
+            
+            const gameFilterContainer = document.getElementById('game-filter-container');
+            const mapListContainer = document.getElementById('map-list-container');
+            const mapDetailsContainer = document.getElementById('map-details-container');
 
             function populateTimeline() {
                 AppData.timeline.forEach((item, index) => {
                     const navItem = document.createElement('div');
                     navItem.className = 'timeline-item relative pl-8 pb-8 cursor-pointer';
                     navItem.dataset.index = index;
-                    navItem.innerHTML = `
-                        <h4 class="font-bold text-lg text-stone-800">${item.era}</h4>
-                        <p class="text-sm text-stone-500">${item.games}</p>
-                    `;
-                    if (item.saga === 'Aether') {
-                        aetherTimelineNav.appendChild(navItem);
-                    } else if (item.saga === 'Dark Aether') {
-                        darkAetherTimelineNav.appendChild(navItem);
-                    } else if (item.saga === 'Chaos') {
-                        chaosTimelineNav.appendChild(navItem);
-                    }
+                    navItem.innerHTML = `<h4 class="font-bold text-lg text-stone-800">${item.era}</h4><p class="text-sm text-stone-500">${item.games}</p>`;
+                    if (item.saga === 'Aether') aetherTimelineNav.appendChild(navItem);
+                    else if (item.saga === 'Dark Aether') darkAetherTimelineNav.appendChild(navItem);
+                    else if (item.saga === 'Chaos') chaosTimelineNav.appendChild(navItem);
                 });
 
                 document.querySelectorAll('.timeline-item').forEach(item => {
                     item.addEventListener('click', (e) => {
                         document.querySelectorAll('.timeline-item').forEach(i => i.classList.remove('active'));
                         e.currentTarget.classList.add('active');
-                        const index = e.currentTarget.dataset.index;
-                        const data = AppData.timeline[index];
-                        let borderColorClass;
-                        if (data.saga === 'Aether') {
-                            borderColorClass = 'border-red-600';
-                        } else if (data.saga === 'Dark Aether') {
-                            borderColorClass = 'border-indigo-600';
-                        } else { // Chaos
-                            borderColorClass = 'border-emerald-600';
-                        }
-                        timelineDetails.innerHTML = `
-                            <div class="bg-white p-6 rounded-lg shadow-md border-l-4 ${borderColorClass}">
-                                <h3 class="text-2xl font-bold mb-2 text-stone-900">${data.title} (${data.era})</h3>
-                                <p class="text-stone-700">${data.content}</p>
-                            </div>
-                        `;
+                        const data = AppData.timeline[e.currentTarget.dataset.index];
+                        let borderColorClass = data.saga === 'Aether' ? 'border-red-600' : data.saga === 'Dark Aether' ? 'border-indigo-600' : 'border-emerald-600';
+                        timelineDetails.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-md border-l-4 ${borderColorClass}"><h3 class="text-2xl font-bold mb-2 text-stone-900">${data.title} (${data.era})</h3><p class="text-stone-700">${data.content}</p></div>`;
                     });
                 });
-                // Trigger click on the first Aether item by default
                 aetherTimelineNav.querySelector('.timeline-item')?.click();
             }
 
             function populateCharacters() {
+                characterGrid.innerHTML = ''; // Clear existing characters
                 AppData.characters.forEach(char => {
                     const charCard = document.createElement('div');
                     charCard.className = 'text-center cursor-pointer group';
-                    charCard.innerHTML = `
-                        <div class="relative w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full overflow-hidden shadow-lg transform group-hover:scale-110 transition-transform">
-                            <img src="${char.img}" alt="${char.name}" class="w-full h-full object-cover">
-                        </div>
-                        <h4 class="mt-4 font-bold text-lg text-stone-800">${char.name}</h4>
-                    `;
+                    charCard.innerHTML = `<div class="relative w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full overflow-hidden shadow-lg transform group-hover:scale-110 transition-transform"><img src="${char.img}" alt="${char.name}" class="w-full h-full object-cover"></div><h4 class="mt-4 font-bold text-lg text-stone-800">${char.name}</h4>`;
                     charCard.addEventListener('click', () => openCharacterModal(char));
                     characterGrid.appendChild(charCard);
                 });
@@ -479,24 +363,20 @@
                 modalCharName.textContent = character.name;
                 modalTabs.innerHTML = '';
                 modalContent.innerHTML = '';
-
                 const versions = Object.keys(character.versions);
                 versions.forEach((version, index) => {
                     if (character.versions[version] === "N/A") return;
-
                     const tab = document.createElement('button');
                     tab.className = `py-2 px-1 border-b-2 font-semibold text-sm md:text-base ${index === 0 ? 'border-red-600 text-red-600' : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'}`;
                     tab.textContent = version;
                     tab.dataset.version = version;
                     modalTabs.appendChild(tab);
-
                     const content = document.createElement('div');
                     content.id = `content-${version.replace(/\s+/g, '-')}`;
                     content.className = `prose max-w-none text-stone-700 ${index !== 0 ? 'hidden' : ''}`;
                     content.innerHTML = `<p>${character.versions[version]}</p>`;
                     modalContent.appendChild(content);
                 });
-
                 modalTabs.addEventListener('click', (e) => {
                     if (e.target.tagName === 'BUTTON') {
                         const targetVersion = e.target.dataset.version;
@@ -504,128 +384,92 @@
                             btn.className = 'py-2 px-1 border-b-2 font-semibold text-sm md:text-base border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300';
                         });
                         e.target.className = 'py-2 px-1 border-b-2 font-semibold text-sm md:text-base border-red-600 text-red-600';
-
-                        modalContent.querySelectorAll('div').forEach(div => {
-                            div.classList.add('hidden');
-                        });
+                        modalContent.querySelectorAll('div').forEach(div => div.classList.add('hidden'));
                         document.getElementById(`content-${targetVersion.replace(/\s+/g, '-')}`).classList.remove('hidden');
                     }
                 });
-
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             }
-
-            modalCloseBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            });
-
-            modal.addEventListener('click', (e) => {
-                if(e.target === modal) {
-                     modal.classList.add('hidden');
-                     modal.classList.remove('flex');
-                }
-            });
 
             function populateGlossary() {
                 AppData.glossary.forEach(item => {
                     const glossItem = document.createElement('div');
                     glossItem.className = 'bg-white rounded-lg shadow-sm overflow-hidden';
-                    glossItem.innerHTML = `
-                        <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none focus:bg-stone-50 transition-colors">
-                            <span class="font-semibold text-stone-800">${item.term}</span>
-                            <svg class="w-5 h-5 text-stone-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div class="px-4 pb-4 text-stone-600 hidden">
-                            <p>${item.definition}</p>
-                        </div>
-                    `;
+                    glossItem.innerHTML = `<button class="w-full text-left p-4 flex justify-between items-center focus:outline-none focus:bg-stone-50 transition-colors"><span class="font-semibold text-stone-800">${item.term}</span><svg class="w-5 h-5 text-stone-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><div class="px-4 pb-4 text-stone-600 hidden"><p>${item.definition}</p></div>`;
                     glossaryContainer.appendChild(glossItem);
                 });
-
                 glossaryContainer.addEventListener('click', (e) => {
                     const button = e.target.closest('button');
                     if (button) {
-                        const content = button.nextElementSibling;
-                        const icon = button.querySelector('svg');
-                        content.classList.toggle('hidden');
-                        icon.classList.toggle('rotate-180');
+                        button.nextElementSibling.classList.toggle('hidden');
+                        button.querySelector('svg').classList.toggle('rotate-180');
                     }
                 });
             }
 
+            function setupMapExplorer() {
+                const games = Object.keys(AppData.maps);
+                games.forEach(game => {
+                    const button = document.createElement('button');
+                    button.textContent = game;
+                    button.className = 'game-filter-btn px-4 py-2 font-semibold text-stone-600 bg-white rounded-md shadow-sm border-2 border-transparent transition-colors hover:text-red-600';
+                    button.dataset.game = game;
+                    gameFilterContainer.appendChild(button);
+                });
+
+                gameFilterContainer.addEventListener('click', e => {
+                    if (e.target.tagName === 'BUTTON') {
+                        const selectedGame = e.target.dataset.game;
+                        document.querySelectorAll('.game-filter-btn').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        renderMapList(selectedGame);
+                    }
+                });
+            }
+
+            function renderMapList(game) {
+                mapListContainer.innerHTML = '';
+                const maps = AppData.maps[game];
+                maps.forEach(map => {
+                    const mapItem = document.createElement('div');
+                    mapItem.textContent = map.name;
+                    mapItem.className = 'p-3 cursor-pointer hover:bg-stone-100 rounded-md transition-colors';
+                    mapItem.addEventListener('click', () => renderMapDetails(map));
+                    mapListContainer.appendChild(mapItem);
+                });
+                mapDetailsContainer.innerHTML = '<p class="text-stone-500 text-center pt-24">Select a map to see details.</p>';
+            }
+
+            function renderMapDetails(map) {
+                mapDetailsContainer.innerHTML = `
+                    <h3 class="text-2xl font-bold text-stone-900 mb-4">${map.name}</h3>
+                    <p class="text-stone-700">${map.summary}</p>
+                `;
+            }
+            
             function createSagaChart() {
                 const ctx = document.getElementById('sagaChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: [
-                            'Aether Saga (WaW, BO1, BO2, BO3, BO4)',
-                            'Dark Aether Saga (Cold War, Vanguard, MWZ, BO6)',
-                            'Chaos Saga (BO4)'
-                        ],
-                        datasets: [{
-                            label: 'Number of Games',
-                            data: [5, 4, 1], // Updated data for Dark Aether to 4 games (Cold War, Vanguard, MWZ, BO6)
-                            backgroundColor: [
-                                'rgba(220, 38, 38, 0.7)',  // Aether: Red
-                                'rgba(79, 70, 229, 0.7)',  // Dark Aether: Indigo
-                                'rgba(4, 120, 87, 0.7)'    // Chaos: Emerald
-                            ],
-                            borderColor: [
-                                'rgb(220, 38, 38)',
-                                'rgb(79, 70, 229)',
-                                'rgb(4, 120, 87)'
-                            ],
-                            borderWidth: 1
-                        }]
+                        labels: ['Aether Saga (5 Games)', 'Dark Aether Saga (4 Games)', 'Chaos Saga (1 Game)'],
+                        datasets: [{ label: 'Number of Games', data: [5, 4, 1], backgroundColor: ['rgba(220, 38, 38, 0.7)', 'rgba(79, 70, 229, 0.7)', 'rgba(4, 120, 87, 0.7)'], borderColor: ['rgb(220, 38, 38)', 'rgb(79, 70, 229)', 'rgb(4, 120, 87)'], borderWidth: 1 }]
                     },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            title: {
-                                display: true,
-                                text: 'Games per Story Arc',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
-                                },
-                                color: '#44403c'
-                            }
-                        },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Games per Story Arc', font: { size: 16, weight: 'bold' }, color: '#44403c' } }, scales: { x: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1 } }, y: { grid: { display: false } } } }
                 });
             }
+
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            modalCloseBtn.addEventListener('click', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.add('hidden'); });
 
             populateTimeline();
             populateCharacters();
             populateGlossary();
+            setupMapExplorer();
             createSagaChart();
         });
     </script>
 </body>
 </html>
-
-
